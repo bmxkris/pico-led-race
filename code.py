@@ -23,10 +23,9 @@ led.direction = digitalio.Direction.OUTPUT
 
 
 def winner_animation(pixels, pixels2, button1, button2, reset_button):
-    print("winning annimation")
     animations = AnimationSequence(
         Blink(pixels, speed=0.07, color=WHITE), 
-        Comet(pixels, speed=0.0082 ,color=PURPLE, tail_length=10, bounce=True),
+        Comet(pixels, speed=0.0082, color=PURPLE, tail_length=10, bounce=True), 
         Rainbow(pixels, speed=0.01, period=1.5),
         Rainbow(pixels, speed=0.01, period=1.5),
         Rainbow(pixels, speed=0.01, period=1.5),
@@ -37,7 +36,7 @@ def winner_animation(pixels, pixels2, button1, button2, reset_button):
     while animations.cycle_count < 1 :
         animations.animate()
         
-    standby_animation(pixels, pixels2, button1, button2, reset_button)
+    return True
 
 
 def create_button(gpio_pin):
@@ -47,10 +46,10 @@ def create_button(gpio_pin):
     return Debouncer(pin)
 
 def increment_pixels(pixels, player):
-        pixels[player] = GREEN
-        pixels.show()
-        player += 1
-        return player
+    pixels[player] = GREEN
+    pixels.show()
+    player += 1
+    return player
 
 def init_game(pixels, pixels2, button1, button2, reset_button):
     animations = AnimationSequence(
@@ -84,30 +83,26 @@ def init_game(pixels, pixels2, button1, button2, reset_button):
     global play_to
     player1 = 0
     player2 = 0
-
-    while True:
+    game_over = False
+    
+    while not game_over:
         led.value = True
         button1.update()
         button2.update()
 
         if button1.fell:
-            print("Just pressed 1")
-            print(player1)
-            player1 = increment_pixels(pixels,player1)
+            player1 = increment_pixels(pixels, player1)
 
         if button2.fell:
-            print("Just pressed 2")
-            print(player2)
-            player2 = increment_pixels(pixels2,player2)
+            player2 = increment_pixels(pixels2, player2)
 
         if player1 == play_to:
-            # animate
-            print("Player 1 wins")
-            winner_animation(pixels, pixels2, button1, button2, reset_button)
+            game_over = winner_animation(pixels, pixels2, button1, button2, reset_button)
 
         elif player2 == play_to:
-            print("Player 2 wins")
-            winner_animation(pixels2, pixels, button1, button2, reset_button)
+            game_over = winner_animation(pixels2, pixels, button1, button2, reset_button)
+    
+    standby_animation(pixels, pixels2, button1, button2, reset_button)
 
 def standby_animation(pixels, pixels2, button1, button2, reset_button): 
     sparkle = AnimationGroup(
@@ -117,11 +112,10 @@ def standby_animation(pixels, pixels2, button1, button2, reset_button):
     
     while True:
         reset_button.update()
-        #standby animation
+        # standby animation
         sparkle.animate()
         
         if reset_button.fell:
-            print("Just pressed reset")
             init_game(pixels, pixels2, button1, button2, reset_button)
 
 
