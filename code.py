@@ -14,8 +14,8 @@ from adafruit_debouncer import Debouncer
 import fourdigitsevensegmentLEDdisplay as led_display
 
 num_pixels = 90
-play_to = 3  # or num_pixels
-brightness = 0.1
+play_to = 90  # or num_pixels
+brightness = 1
 
 led = digitalio.DigitalInOut(board.LED)
 led.direction = digitalio.Direction.OUTPUT
