@@ -132,7 +132,7 @@ def setup_and_standby():
 
     standby_animation(pixels, pixels2, button1, button2, reset_button)
 
-if __name__ == '__main__': #Program starting from here
+if __name__ == '__main__': #  Program starting from here
 
     setup_and_standby()
 

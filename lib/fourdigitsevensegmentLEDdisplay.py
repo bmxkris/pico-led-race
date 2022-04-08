@@ -1,11 +1,42 @@
+"""
+# use this code in a separate file (code.py) to test this module
+
+import board
+import digitalio
+import time
+import fourdigitsevensegmentLEDdisplay as led_display
+
+led = digitalio.DigitalInOut(board.LED)
+led.direction = digitalio.Direction.OUTPUT
+
+display_numbers = [9, 1.234, 150.667, 0.1, 9999, 0.123, 37.5, 0.123456, 1234.5678, 10, 37.5566]
+
+while True:
+    led.value = True
+
+    for value in display_numbers:
+
+        t_end = time.time() + 2
+        while time.time() < t_end:
+            led_display.display_number(value)
+
+"""
+
 import board
 import digitalio
 import time
 import math
 
+def clear_display():
+    for bit in bits:
+        bit.value = True
+
+def clear_segments():
+    for segment in segments:
+        segment.value = False
+
 def create_segments(pins):
     segments = []
-
     for pin in pins:
         led = digitalio.DigitalInOut(pin)
         led.direction = digitalio.Direction.OUTPUT
@@ -16,7 +47,6 @@ def create_segments(pins):
 
 def create_bits(digits):
     bits = []
-
     for digit in digits:
         bit = digitalio.DigitalInOut(digit)
         bit.direction = digitalio.Direction.OUTPUT
@@ -32,60 +62,53 @@ def display_number(number):
     #  have to use reversed() in conjunction with the order of the bits if you want the number to right-justify on the display
     for unit in reversed(disp_digits):
         bits[n].value = False
-        for segment in segments:
-            segment.value = False
 
         if unit == '.':
             dp = True
             continue
-            
+
         seg_map = numbers[unit]
-        
-        # modify seg_map if last parse was a dp
-        if dp is True:
-            seg_map[-1] = 1
-            dp = False
-        
+
         for m, segment in enumerate(seg_map):
             if segment == 1:
                 segments[m].value = True
-            
+            elif dp is True:        # modify seg_map if last parse was a dp
+                segments[7].value = True
+                dp = False
+
         time.sleep(0.001)
-        bits[n].value = True
+        clear_display()
+        clear_segments()
         n += 1
-    
+
 
 def parse_number(number):
-    
-    # if number above or below - error
+
+    #  if number above or below - error
     if number > 9999 or number < 0.001:
         return 'Erro'
         #  raise Exception("Number must be between 9999 and 0.001")
 
-    # if it's more than 999 floor
-    elif number > 999:
+    #  if it's more than 999 floor
+    if number > 999:
         return str(math.floor(number))
 
-    # if it's between 10 and 999, check for decimal point and reduce to one or two dp if it's there
-    elif number >= 10 and number <= 999:
-        if number % 1 > 0:
-            #  format to  1dp and return
+    #  if it's greater than 10 and (implicitly) <= 999, check for decimal point and reduce to one or two dp if it's there
+    if number >= 10:
+        if number % 1:
+            #  format to 1 or 2dp and return
             return '{0:.4g}'.format(number)
         else:
             return str(number)
-    
-    # if it's less than 10, check for decimal point and reduce to 3 dp if there is one
-    elif number < 10:
-        if number % 1 > 0:
-            #  format to  3dp and return
-            return '{0:.3g}'.format(number)
-        else:
-            return str(number)
-            
-    else:
-        return 'Erro'
 
-pins = [
+    #  Otherwise the number will be < 10 check for decimal point and reduce to 3 dp if there is one
+    if number % 1:
+        #  format to  3dp and return
+        return '{0:.3g}'.format(number)
+    else:
+        return str(number)
+
+pins = [ #  pin - lcd pin
     board.GP20, #  2
     board.GP21, #  1
     board.GP10, #  11
@@ -121,3 +144,5 @@ numbers = {
 
 segments = create_segments(pins)
 bits = create_bits(digits)
+
+
