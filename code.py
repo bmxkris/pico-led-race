@@ -13,8 +13,8 @@ from adafruit_led_animation.color import RED, GREEN, BLUE, WHITE, YELLOW, PURPLE
 from adafruit_debouncer import Debouncer
 import fourdigitsevensegmentLEDdisplay as led_display
 
-num_pixels = 90
-play_to = 90  # or num_pixels
+num_pixels = 50
+play_to = num_pixels  # or num_pixels
 brightness = 1
 
 led = digitalio.DigitalInOut(board.LED)
