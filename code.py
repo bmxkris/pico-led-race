@@ -13,12 +13,10 @@ from adafruit_led_animation.color import RED, GREEN, BLUE, WHITE, YELLOW, PURPLE
 from adafruit_debouncer import Debouncer
 import fourdigitsevensegmentLEDdisplay as led_display
 
-num_pixels = 90
-play_to = 5  # or num_pixels
+num_pixels = 50 
+play_to = num_pixels  # or num_pixels
 brightness = 1
 
-led = digitalio.DigitalInOut(board.LED)
-led.direction = digitalio.Direction.OUTPUT
 
 def winner_animation(pixels, time_played):
     animations = AnimationSequence(
@@ -87,7 +85,6 @@ def init_game(pixels, pixels2, button1, button2, reset_button):
     start_time = time.monotonic()
 
     while not game_over:
-        led.value = True
         button1.update()
         button2.update()
 
